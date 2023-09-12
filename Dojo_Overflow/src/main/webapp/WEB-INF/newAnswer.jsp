@@ -26,6 +26,7 @@ pageEncoding="ISO-8859-1"%>
 <body>
 <div class="container">
 	<h2><c:out value="${question.getQuestion()}"></c:out></h2>
+	<a href="../dashboard" class="float-end">Back home</a>
 	<c:set var="list" value="" />
 	<c:forEach items="${question.getTags()}" var="t" varStatus="loop">
 		<c:set var="list" value="${list}${t.getSubject()}" />
@@ -37,6 +38,9 @@ pageEncoding="ISO-8859-1"%>
 	<div class="row mt-4">
 		<div class="col-4">
 		<p>Answers:</p>
+		<c:forEach items="${question.getAnswer()}" var="a">
+			<p><c:out value="${a.getAnswer()}"></c:out></p>
+		</c:forEach>
 		</div>
 		<div class="col-4">
 			<h3>Add your answer:</h3>

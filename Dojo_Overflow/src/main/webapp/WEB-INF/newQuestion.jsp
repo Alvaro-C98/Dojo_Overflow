@@ -26,6 +26,7 @@ pageEncoding="ISO-8859-1"%>
 <body>
 	<div class="container">
 	<h3>New Question</h3>
+	<a href="../dashboard" class="float-end">Back home</a>
 		<form:form action="/questions/new" method="POST" modelAttribute="quest">
 		<p class="text-danger"><c:out value="${error}"></c:out></p>
 			<div class="form-group">

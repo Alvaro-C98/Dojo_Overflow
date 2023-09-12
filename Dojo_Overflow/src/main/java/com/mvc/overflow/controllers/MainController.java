@@ -40,7 +40,7 @@ public class MainController {
     }
     
     @PostMapping("/questions/new")
-    public String createQuestion(@ModelAttribute("quest") QuestionTag question, RedirectAttributes redirect, Model model) {
+    public String createQuestion(@ModelAttribute("quest") QuestionTag question, Model model) {
         if (question.getQuestion().getQuestion().isBlank() || question.getTag().getSubject().isBlank()) {
         	model.addAttribute("error","Fields must not be empty");
             return "newQuestion.jsp";
@@ -90,7 +90,7 @@ public class MainController {
     public String createAnswer(@Valid @ModelAttribute("ans") Answers answer, BindingResult result,
     		@PathVariable("id") Long id) {
         if (result.hasErrors()) {
-            return "newAnswer.jsp";
+            return "redirect:/question/"+id;
         } else {
         	Questions question = mainSer.findQuestion(id);
         	List<Answers> answers = question.getAnswer();
@@ -101,13 +101,15 @@ public class MainController {
                 }
             }
             if(b==0) {
-            	answer.setQuestion(question);
-            	mainSer.createAnswer(answer);
-            	answers.add(answer);
+            	Answers newAnswer = new Answers();
+            	newAnswer.setAnswer(answer.getAnswer());
+            	newAnswer.setQuestion(question);
+            	mainSer.createAnswer(newAnswer);
+            	answers.add(newAnswer);
                 question.setAnswer(answers);
                 mainSer.updateQuestion(question);
             }
-            return "redirect:/dashboard";
+            return "redirect:/question/"+id;
         }
     }
 	
