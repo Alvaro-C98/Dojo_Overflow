@@ -26,16 +26,17 @@ pageEncoding="ISO-8859-1"%>
 <body>
 	<div class="container">
 	<h3>New Question</h3>
-		<form:form action="/questions/new" method="Post" modelAttribute="quest">
+		<form:form action="/questions/new" method="POST" modelAttribute="quest">
+		<p class="text-danger"><c:out value="${error}"></c:out></p>
 			<div class="form-group">
-				<form:label path="question" class="form-label">Question: </form:label>
-				<form:input path="question" class="form-control"/>
-				<form:errors path="question" class="text-danger"/>
+				<form:label path="question.question" class="form-label">Question: </form:label>
+				<form:input path="question.question" class="form-control"/>
+				<form:errors path="question.question" class="text-danger"/>
 			</div>
 			<div class="form-group">
-				<form:label path="subject" class="form-label">Tags: </form:label>
-				<form:input path="subject" class="form-control"/>
-				<form:errors path="subject" class="text-danger"/>
+				<form:label path="tag.subject" class="form-label">Tags: </form:label>
+				<form:input path="tag.subject" class="form-control"/>
+				<form:errors path="tag.subject" class="text-danger"/>
 			</div>
 			<button class="btn btn-success mt-2">Created</button>
 		</form:form>

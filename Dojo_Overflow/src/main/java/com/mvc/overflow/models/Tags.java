@@ -1,6 +1,5 @@
 package com.mvc.overflow.models;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class Tags {
             joinColumns = @JoinColumn(name = "tag_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
             )
-    private ArrayList<Questions> questions = new ArrayList<Questions>();
+    private List<Questions> questions;
 
 	@Column(updatable=false)
     private Date createdAt;
@@ -72,8 +71,8 @@ public class Tags {
 		return questions;
 	}
 
-	public void setQuestions(Questions question) {
-		this.questions.add(question);
+	public void setQuestions(List<Questions> question) {
+		this.questions = question;
 	}
 	
 }

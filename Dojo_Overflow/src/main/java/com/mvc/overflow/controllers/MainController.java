@@ -9,8 +9,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.mvc.overflow.models.Answers;
+import com.mvc.overflow.models.QuestionTag;
 import com.mvc.overflow.models.Questions;
 import com.mvc.overflow.models.Tags;
 import com.mvc.overflow.services.MainService;
@@ -31,58 +35,37 @@ public class MainController {
 	}
 	
     @GetMapping("/questions/new")
-    public String newQuestion(@ModelAttribute("quest") Questions question) {
+    public String newQuestion(@ModelAttribute("quest") QuestionTag question) {
         return "newQuestion.jsp";
     }
     
     @PostMapping("/questions/new")
-    public String createQuestion(@Valid @ModelAttribute("quest") Questions question, 
-    		BindingResult resultQuestion) {
-    	   System.out.println(question.getQuestion());
-           System.out.println(question.getSubject());
-        if (resultQuestion.hasErrors()) {
+    public String createQuestion(@ModelAttribute("quest") QuestionTag question, RedirectAttributes redirect, Model model) {
+        if (question.getQuestion().getQuestion().isBlank() || question.getTag().getSubject().isBlank()) {
+        	model.addAttribute("error","Fields must not be empty");
             return "newQuestion.jsp";
         } else {
-        	ArrayList<String> newtag = new ArrayList<String>();
-        	List<String> tags = Arrays.asList(question.getSubject().split("\\s*,\\s*"));
-        	System.out.println(tags);
-        	System.out.println(mainSer.allTags().size());
-        	
-        	if(mainSer.allTags().size()==0) {
-            	for(String tag : tags) {
-            		System.out.println("cad: "+tag);
-    				Tags newTag = new Tags();
-    				System.out.println("Se creo tag");
-    				newTag.setSubject(tag);
-    				System.out.println("Se seteo el tag con "+tag);
-    				mainSer.createTag(newTag);
-    				System.out.println("Se creo el tag");
-            	}
-            	System.out.println("popopo");
-            	
-            	for(Tags subject : mainSer.allTags()) {
-            		subject.setQuestions(question);
-            		System.out.println("Se completo");
-            	}
-	
-        	}else {
-            	for(String tag : tags) {
-            		int b=0;
-            		System.out.println("tag: "+tag);
-            		for(Tags subject : mainSer.allTags()){
-            			System.out.println("subject: "+subject.getSubject());
-            			if(tag.equals(subject.getSubject())) {
-            				b=1;
-            				System.out.println("b="+b);
-            				Tags uptag = mainSer.findTag(subject.getId());
-            				uptag.setQuestions(question);
-            			}
-            		}
-            		if(b==0) {
-            			newtag.add(tag);
-            		}
-            	}
+        	List<String> tagStrings = Arrays.asList(question.getTag().getSubject().split("\\s*,\\s*"));
+        	List<Tags> tags = new ArrayList<>();
+        	Questions newQuestion = new Questions();
+        	for(String tag : tagStrings) {
+        		Tags tagExist = mainSer.findSubject(tag);
+        		if(tagExist==null) {
+        			Tags newTag = new Tags();
+        			newTag.setSubject(tag);
+        			tags.add(newTag);
+        		}else {
+        			tags.add(tagExist);
+        		}
         	}
+        	for(Tags tag : tags) {
+        		mainSer.createTag(tag);
+        	}
+        	
+        	newQuestion.setTags(tags);
+        	newQuestion.setQuestion(question.getQuestion().getQuestion());
+        	mainSer.createQuestion(newQuestion);
+        	
             return "redirect:/";
         }
     }
@@ -92,6 +75,40 @@ public class MainController {
         List<Questions> question = mainSer.allQuestions();
         model.addAttribute("question", question);
         return "dashboard.jsp";
+    }
+    
+    @GetMapping("/question/{id}")
+    public String newQuestion(@ModelAttribute("ans") Answers qanswer,
+    		@PathVariable("id") Long id,
+    		Model model) {
+    	Questions question = mainSer.findQuestion(id);
+    	model.addAttribute("question",question);
+        return "newAnswer.jsp";
+    }
+    
+    @PostMapping("/question/{id}")
+    public String createAnswer(@Valid @ModelAttribute("ans") Answers answer, BindingResult result,
+    		@PathVariable("id") Long id) {
+        if (result.hasErrors()) {
+            return "newAnswer.jsp";
+        } else {
+        	Questions question = mainSer.findQuestion(id);
+        	List<Answers> answers = question.getAnswer();
+            int b = 0;
+            for(Answers a : answers) {
+                if(a.getAnswer().equals(answer.getAnswer())) {
+                	b=1;
+                }
+            }
+            if(b==0) {
+            	answer.setQuestion(question);
+            	mainSer.createAnswer(answer);
+            	answers.add(answer);
+                question.setAnswer(answers);
+                mainSer.updateQuestion(question);
+            }
+            return "redirect:/dashboard";
+        }
     }
 	
 }

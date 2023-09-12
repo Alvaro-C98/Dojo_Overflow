@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.mvc.overflow.models.Tags;
+import com.mvc.overflow.models.Answers;
 
 @Repository
-public interface TagRepository extends CrudRepository<Tags,Long>{
-	List<Tags> findAll();
-		
-	Tags findBySubject(String s);
+public interface AnswerRepository extends CrudRepository<Answers,Long>{
+	List<Answers> findAll();
+	
+	Answers findByAnswer(String s);
 }

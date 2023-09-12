@@ -34,12 +34,22 @@ pageEncoding="ISO-8859-1"%>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td></td>
-					<td></td>
-				</tr>
+				<c:forEach items="${question}" var="q">
+						<tr>
+							<td><a href="question/${q.getId()}">${q.getQuestion()}</a></td>
+							<c:set var="list" value="" />
+							<c:forEach items="${q.getTags()}" var="t" varStatus="loop">
+								<c:set var="list" value="${list}${t.getSubject()}" />
+								    <c:if test="${!loop.last}">
+        								<c:set var="list" value="${list}, " />
+   									</c:if>
+							</c:forEach>
+							<td>${list}</td>
+						</tr>
+				</c:forEach>
 			</tbody>
 		</table>
+		<a href="../questions/new" class="float-end"><button>Create Question</button></a>
 	</div>
 </body>
 </html>
